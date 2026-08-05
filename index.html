@@ -23,7 +23,7 @@
 
 <div class="container">
   <h2>Pinterest Downloader 📌</h2>
-  <p>कोणतीही Pinterest व्हिडिओ लिंक टाका आणि एका क्लिकवर डाऊनलोड करा!</p>
+  <p>कोणतीही Pinterest व्हिडिओ लिंक टाका आणि डाऊनलोड करा!</p>
 
   <input type="text" id="pinUrl" placeholder="Pinterest व्हिडिओ लिंक इथे पेस्ट करा..." />
   <button onclick="downloadPin()">डाऊनलोड करा 🚀</button>
@@ -40,12 +40,11 @@
       return;
     }
 
-    // Direct fetch-through link mapping
     let cleanUrl = encodeURIComponent(rawUrl);
-    let targetUrl = "https://pinterestdownloader.io/download?url=" + cleanUrl;
+    let targetUrl = "https://pinterestvideodownloader.com/?url=" + cleanUrl;
 
     document.getElementById('resultBox').innerHTML = `
-      <a href="${targetUrl}" class="dl-btn" target="_blank">📥 HD Video Download (Direct)</a>
+      <a href="${targetUrl}" class="dl-btn" target="_blank">📥 Direct HD Video Download</a>
     `;
   }
 </script>
