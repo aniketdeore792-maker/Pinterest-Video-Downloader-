@@ -6,14 +6,20 @@
   <title>Pinterest Video Downloader 📌</title>
   <style>
     * { box-sizing: border-box; }
-    body { font-family: sans-serif; background: linear-gradient(135deg, #E60023, #111); min-height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; padding: 20px; color: #333; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #E60023, #111); min-height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; padding: 20px; color: #333; }
     .container { background: #fff; padding: 25px; border-radius: 16px; width: 100%; max-width: 480px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
     h2 { color: #E60023; margin-bottom: 8px; font-size: 24px; }
     p { font-size: 14px; color: #666; margin-bottom: 20px; }
     input[type="text"] { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 15px; outline: none; font-size: 15px; }
-    button { width: 100%; background: #E60023; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; }
+    button { width: 100%; background: #E60023; color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s; }
     button:hover { background: #b8001c; }
-    .dl-btn { display: inline-block; width: 100%; background: #28a745; color: white; text-decoration: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; margin-top: 15px; text-align: center; }
+    
+    /* Result Box Styles */
+    #resultBox { margin-top: 20px; }
+    video { width: 100%; border-radius: 12px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    .dl-btn { display: inline-block; width: 100%; background: #28a745; color: white; text-decoration: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 8px; text-align: center; }
+    .dl-btn:hover { background: #218838; }
+    .loader { font-weight: bold; color: #E60023; margin-top: 15px; }
   </style>
 
   <!-- AdSterra Direct Script -->
@@ -23,29 +29,58 @@
 
 <div class="container">
   <h2>Pinterest Downloader 📌</h2>
-  <p>कोणतीही Pinterest व्हिडिओ लिंक टाका आणि डाऊनलोड करा!</p>
+  <p>कोणतीही Pinterest व्हिडिओ लिंक टाका आणि इथेच डाऊनलोड करा!</p>
 
   <input type="text" id="pinUrl" placeholder="Pinterest व्हिडिओ लिंक इथे पेस्ट करा..." />
-  <button onclick="downloadPin()">डाऊनलोड करा 🚀</button>
+  <button onclick="fetchPinterestVideo()">व्हिडिओ शोधा 🚀</button>
 
   <div id="resultBox"></div>
 </div>
 
 <script>
-  function downloadPin() {
-    let rawUrl = document.getElementById('pinUrl').value.trim();
-    
-    if (!rawUrl) {
-      alert('कृपया Pinterest लिंक टाका!');
+  async function fetchPinterestVideo() {
+    let pinUrl = document.getElementById('pinUrl').value.trim();
+    let resultBox = document.getElementById('resultBox');
+
+    if (!pinUrl) {
+      alert('कृपया Pinterest व्हिडिओ लिंक टाका!');
       return;
     }
 
-    let cleanUrl = encodeURIComponent(rawUrl);
-    let targetUrl = "https://pinterestvideodownloader.com/?url=" + cleanUrl;
+    resultBox.innerHTML = `<div class="loader">⏳ व्हिडिओ शोधत आहे, कृपया ५ सेकंद थांबा...</div>`;
 
-    document.getElementById('resultBox').innerHTML = `
-      <a href="${targetUrl}" class="dl-btn" target="_blank">📥 Direct HD Video Download</a>
-    `;
+    try {
+      // Rapid API - Direct Fetcher for Pinterest
+      let apiUrl = `https://api.vkrdown.com/pinterest/?url=${encodeURIComponent(pinUrl)}`;
+      let response = await fetch(apiUrl);
+      let data = await response.json();
+
+      if (data && data.data && data.data.url) {
+        let videoUrl = data.data.url;
+        
+        resultBox.innerHTML = `
+          <video controls autoplay muted src="${videoUrl}"></video>
+          <a href="${videoUrl}" download="Pinterest_Video.mp4" target="_blank" class="dl-btn">📥 HD Video Download</a>
+        `;
+      } else {
+        // Fallback API Engine
+        let backupApi = `https://www.tikwm.com/api/pinterest/?url=${encodeURIComponent(pinUrl)}`;
+        let backupRes = await fetch(backupApi);
+        let backupData = await backupRes.json();
+
+        if (backupData && backupData.data && backupData.data.play) {
+          let videoUrl = backupData.data.play;
+          resultBox.innerHTML = `
+            <video controls autoplay muted src="${videoUrl}"></video>
+            <a href="${videoUrl}" download="Pinterest_Video.mp4" target="_blank" class="dl-btn">📥 HD Video Download</a>
+          `;
+        } else {
+          resultBox.innerHTML = `<p style="color:red;">❌ व्हिडिओ लिंक मिळाली नाही. कृपया योग्य लिंक टाका.</p>`;
+        }
+      }
+    } catch (error) {
+      resultBox.innerHTML = `<p style="color:red;">❌ एरर आला. कृपया १ मिनिटाने पुन्हा प्रयत्न करा.</p>`;
+    }
   }
 </script>
 
